@@ -1,25 +1,37 @@
+import logging
 from flask import Blueprint, request, jsonify
+from marshmallow import ValidationError
+from sqlalchemy.exc import SQLAlchemyError  # Captura errores de la base de datos
+
 from app.services.sensor_service import create_sensor_data, retrieve_all_sensor_data
+from app.schemas.sensor_schema import SensorDataSchema
 
 sensor_bp = Blueprint('sensor_bp', __name__)
+sensor_schema = SensorDataSchema()
 
-@sensor_bp.route('/', methods=['POST'])
+# Configurar logs
+logger = logging.getLogger(__name__)
+
+@sensor_bp.route('/data', methods=['POST'])
 def add_sensor_data():
-    data = request.get_json()
-    sensor_data = create_sensor_data(data)
-    return jsonify({'message': 'Sensor data added', 'id': sensor_data.id}), 201
+    try:
+        data = request.get_json()
+        validated_data = sensor_schema.load(data)
 
-@sensor_bp.route('/', methods=['GET'])
-def get_sensor_data():
-    sensor_data_list = retrieve_all_sensor_data()
-    result = [
-        {
-            'id': data.id,
-            'device_id': data.device_id,
-            'timestamp': data.timestamp,
-            'temperature': data.temperature,
-            'humidity': data.humidity,
-            'status_code': data.status_code
-        } for data in sensor_data_list
-    ]
-    return jsonify(result), 200
+        # Crear y almacenar el dato en la BD
+        sensor_data = create_sensor_data(validated_data)
+        logger.info(f"Nuevo dato recibido y almacenado: {sensor_data.to_dict()}")
+
+        return jsonify(sensor_data.to_dict()), 201
+
+    except ValidationError as e:
+        logger.warning(f"Validación fallida - Datos inválidos: {e.messages}")
+        return jsonify({"error": "Datos inválidos", "detalles": e.messages}), 400
+
+    except SQLAlchemyError as e:
+        logger.error(f"Error en la base de datos: {str(e)}")
+        return jsonify({"error": "Error en la base de datos"}), 500
+
+    except Exception as e:
+        logger.critical(f"Error inesperado en la API: {str(e)}", exc_info=True)
+        return jsonify({"error": "Error inesperado"}), 500
