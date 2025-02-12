@@ -14,33 +14,33 @@ logger = logging.getLogger(__name__)
 
 @sensor_bp.route('/data', methods=['POST'])
 def add_sensor_data():
-    try:
-        # Verificar si el Content-Type es correcto antes de llamar get_json()
+ try:
+        # Verificar que el Content-Type sea correcto
         if request.content_type != "application/json":
-            logger.warning("Solicitud con Content-Type incorrecto")
+            logger.warning("⚠️ Content-Type incorrecto en la solicitud")
             return jsonify({"error": "El Content-Type debe ser 'application/json'"}), 400
 
         data = request.get_json()
         validated_data = sensor_schema.load(data)
 
-        # Guardar en la base de datos
+        # Guardar datos en BD
         sensor_data = create_sensor_data(validated_data)
-        logger.info(f"Nuevo dato recibido y almacenado: {sensor_data.to_dict()}")
+        logger.info(f"Datos guardados correctamente: {sensor_data.to_dict()}")
 
         return jsonify(sensor_data.to_dict()), 201
 
     except ValidationError as e:
-        logger.warning(f"Validación fallida - Datos inválidos: {e.messages}")
+        logger.warning(f"⚠️ Datos inválidos recibidos: {e.messages}")
         return jsonify({"error": "Datos inválidos", "detalles": e.messages}), 400
 
-    except SQLAlchemyError as e:
-        logger.error(f"Error en la base de datos: {str(e)}")
-        return jsonify({"error": "Error en la base de datos"}), 500
-
     except Exception as e:
-        logger.critical(f"Error inesperado en la API: {str(e)}", exc_info=True)
-        return jsonify({"error": "Error inesperado"}), 500
-
+        if "No se pudo conectar a la base de datos" in str(e):
+            logger.error("Fallo crítico: La base de datos no está disponible.")
+            return jsonify({"error": "No se pudo conectar a la base de datos."}), 503  # 503 = Servicio no disponible
+        else:
+            logger.critical(f"Error inesperado en la API: {e}")
+            return jsonify({"error": "Error inesperado en el servidor"}), 500
+        
 @sensor_bp.route('/data', methods=['GET'])
 def get_sensor_data():
     try:
