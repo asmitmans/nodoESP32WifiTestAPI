@@ -125,7 +125,7 @@ flask db upgrade
 
 ### Ejecutar la API
 ```bash
-flask run --port=${FLASK_RUN_PORT}
+flask run
 ```
 
 Por defecto, la API estará disponible en:
