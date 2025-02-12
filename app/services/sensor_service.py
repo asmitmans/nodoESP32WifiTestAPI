@@ -18,4 +18,4 @@ def create_sensor_data(data):
 
 
 def retrieve_all_sensor_data():
-    return [data.to_dict() for data in get_all_sensor_data()]
+    return get_all_sensor_data()
