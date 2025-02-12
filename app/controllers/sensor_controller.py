@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 @sensor_bp.route('/data', methods=['POST'])
 def add_sensor_data():
- try:
-        # Verificar que el Content-Type sea correcto
+    try:
+        # 📌 Verificar que el Content-Type sea correcto
         if request.content_type != "application/json":
             logger.warning("⚠️ Content-Type incorrecto en la solicitud")
             return jsonify({"error": "El Content-Type debe ser 'application/json'"}), 400
@@ -25,7 +25,7 @@ def add_sensor_data():
 
         # Guardar datos en BD
         sensor_data = create_sensor_data(validated_data)
-        logger.info(f"Datos guardados correctamente: {sensor_data.to_dict()}")
+        logger.info(f"✅ Datos guardados correctamente: {sensor_data.to_dict()}")
 
         return jsonify(sensor_data.to_dict()), 201
 
@@ -35,10 +35,10 @@ def add_sensor_data():
 
     except Exception as e:
         if "No se pudo conectar a la base de datos" in str(e):
-            logger.error("Fallo crítico: La base de datos no está disponible.")
+            logger.error("🚨 Fallo crítico: La base de datos no está disponible.")
             return jsonify({"error": "No se pudo conectar a la base de datos."}), 503  # 503 = Servicio no disponible
         else:
-            logger.critical(f"Error inesperado en la API: {e}")
+            logger.critical(f"🚨 Error inesperado en la API: {e}")
             return jsonify({"error": "Error inesperado en el servidor"}), 500
         
 @sensor_bp.route('/data', methods=['GET'])
