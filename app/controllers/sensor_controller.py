@@ -35,3 +35,18 @@ def add_sensor_data():
     except Exception as e:
         logger.critical(f"Error inesperado en la API: {str(e)}", exc_info=True)
         return jsonify({"error": "Error inesperado"}), 500
+
+@sensor_bp.route('/data', methods=['GET'])
+def get_sensor_data():
+    try:
+        data = retrieve_all_sensor_data()
+        logger.info(f"Consulta de datos - Total registros: {len(data)}")
+        return jsonify([d.to_dict() for d in data]), 200
+
+    except SQLAlchemyError as e:
+        logger.error(f"Error en la base de datos al consultar datos: {str(e)}")
+        return jsonify({"error": "Error en la base de datos"}), 500
+
+    except Exception as e:
+        logger.critical(f"Error inesperado en la API al consultar datos: {str(e)}", exc_info=True)
+        return jsonify({"error": "Error inesperado"}), 500
