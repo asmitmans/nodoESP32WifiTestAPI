@@ -15,10 +15,15 @@ logger = logging.getLogger(__name__)
 @sensor_bp.route('/data', methods=['POST'])
 def add_sensor_data():
     try:
+        # Verificar si el Content-Type es correcto antes de llamar get_json()
+        if request.content_type != "application/json":
+            logger.warning("Solicitud con Content-Type incorrecto")
+            return jsonify({"error": "El Content-Type debe ser 'application/json'"}), 400
+
         data = request.get_json()
         validated_data = sensor_schema.load(data)
 
-        # Crear y almacenar el dato en la BD
+        # Guardar en la base de datos
         sensor_data = create_sensor_data(validated_data)
         logger.info(f"Nuevo dato recibido y almacenado: {sensor_data.to_dict()}")
 
