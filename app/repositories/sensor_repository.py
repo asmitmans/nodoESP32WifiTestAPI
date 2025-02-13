@@ -13,12 +13,12 @@ def save_sensor_data(sensor_data):
         logger.error("Error de conexión con la base de datos. PostgreSQL podría estar apagado.")
         raise Exception("No se pudo conectar a la base de datos.")
     except Exception as e:
-        logger.error(f"Error interno en la base de datos: {e}")
+        logger.error("Error interno en la base de datos: {}".format(e))
         raise Exception("Error al procesar la solicitud en la base de datos.")
 
 def get_all_sensor_data():
     try:
         return SensorData.query.all()
     except Exception as e:
-        logger.error(f"Error al obtener datos: {e}")
+        logger.error("Error al obtener datos: {}".format(e))
         return []

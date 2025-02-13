@@ -25,12 +25,11 @@ def add_sensor_data():
 
         # Guardar datos en BD
         sensor_data = create_sensor_data(validated_data)
-        logger.info(f"Datos guardados correctamente: {sensor_data.to_dict()}")
-
+        logger.info("Datos guardados correctamente: {}".format(sensor_data.to_dict()))
         return jsonify(sensor_data.to_dict()), 201
 
     except ValidationError as e:
-        logger.warning(f"Datos inválidos recibidos: {e.messages}")
+        logger.warning("Datos inválidos recibidos: {}".format(e.messages))
         return jsonify({"error": "Datos inválidos", "detalles": e.messages}), 400
 
     except Exception as e:
@@ -38,20 +37,20 @@ def add_sensor_data():
             logger.error("Fallo crítico: La base de datos no está disponible.")
             return jsonify({"error": "Error interno en el servidor."}), 503  # 503 = Servicio no disponible
         else:
-            logger.critical(f"Error inesperado en la API: {e}")
+            logger.critical("Error inesperado en la API: {}".format(e))
             return jsonify({"error": "Error inesperado en el servidor"}), 500
         
 @sensor_bp.route('/data', methods=['GET'])
 def get_sensor_data():
     try:
         data = retrieve_all_sensor_data()
-        logger.info(f"Consulta de datos - Total registros: {len(data)}")
+        logger.info("Consulta de datos - Total registros: {}".format(len(data)))
         return jsonify([d.to_dict() for d in data]), 200
 
     except SQLAlchemyError as e:
-        logger.error(f"Error en la base de datos al consultar datos: {str(e)}")
+        logger.error("Error en la base de datos al consultar datos: {}".format(str(e)))
         return jsonify({"error": "Error interno en el servidor."}), 500
 
     except Exception as e:
-        logger.critical(f"Error inesperado en la API al consultar datos: {str(e)}", exc_info=True)
+        logger.critical("Error inesperado en la API al consultar datos: {}".format(str(e)), exc_info=True)
         return jsonify({"error": "Error inesperado"}), 500
