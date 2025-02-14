@@ -1,4 +1,4 @@
-# **nodoESP32WifiTestAPI** - API REST para pruebas con ESP32
+# API REST para pruebas con ESP32
 
 API REST desarrollada en **Flask** para la gestión y almacenamiento de datos de 
 sensores IoT enviados desde un **nodo IoT basado en ESP32**.  
