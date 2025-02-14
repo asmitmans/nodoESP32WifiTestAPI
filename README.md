@@ -26,22 +26,6 @@ Para ejecutar la API, necesitas:
 
 ---
 
-## Configuración
-### Variables de entorno
-Antes de ejecutar la API, configura las credenciales en un archivo **`.env`**:
-
-```
-DATABASE_URL=postgresql://usuario:password@localhost/nombre_de_tu_bd
-FLASK_ENV=development
-FLASK_RUN_PORT=55555
-```
-
-**Si usas un puerto diferente al `5000`, debes abrirlo en el firewall.**
-
-**No compartas este archivo en el repositorio. Agrega `.env` a `.gitignore`.**
-
----
-
 ## Estructura del Proyecto
 El código sigue un diseño modular y organizado:
 
@@ -108,15 +92,28 @@ pip install -r requirements.txt
 ```
 
 ### Configurar variables de entorno
-Crear un archivo **`.env`** en la raíz del proyecto con el siguiente contenido:
+Antes de ejecutar la API, es necesario configurar las variables de entorno.  
+
+Crea un archivo **.env** en la raíz del proyecto con el siguiente contenido:
 
 ```
-DATABASE_URL=postgresql://usuario:password@localhost/nombre_de_base_datos
+DATABASE_URL=postgresql://usuario:password@localhost:5432/nombre_bd
+FLASK_APP=app
 FLASK_ENV=development
+FLASK_RUN_HOST=0.0.0.0
 FLASK_RUN_PORT=55555
 ```
 
-**Reemplaza los valores de conexión a PostgreSQL según tu configuración.**
+- **DATABASE_URL**: URL de conexión a PostgreSQL. Modifica `password` y `nombre_bd` según tu configuración.  
+- **FLASK_APP**: Define el módulo principal de la aplicación (`app` en este caso).  
+- **FLASK_ENV**: Modo de ejecución (`development` para desarrollo, `production` para producción).  
+- **FLASK_RUN_HOST**: Define en qué IP debe correr la API (`0.0.0.0` para hacerla accesible en la red).  
+- **FLASK_RUN_PORT**: Puerto en el que se ejecutará la API (`55555` por defecto).  
+
+**Asegúrate de no compartir este archivo `.env` públicamente si contiene credenciales sensibles.**
+
+También es recomendable asegurarse de que `.env` está en el **`.gitignore`** para evitar 
+que se suba al repositorio.
 
 ### Inicializar la base de datos
 ```bash
