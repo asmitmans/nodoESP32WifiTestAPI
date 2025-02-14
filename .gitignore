@@ -2,3 +2,6 @@
 
 migrations/versions/*.pyc
 migrations/versions/__pycache__/
+
+__pycache__/
+*.pyc
